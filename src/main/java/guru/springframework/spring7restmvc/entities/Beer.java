@@ -2,7 +2,9 @@ package guru.springframework.spring7restmvc.entities;
 
 import guru.springframework.spring7restmvc.model.BeerStyle;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
 import lombok.*;
+import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.UuidGenerator;
 
 import java.math.BigDecimal;
@@ -27,6 +29,7 @@ public class Beer {
 
     @Version
     private Integer version;
+
     private String beerName;
     private BeerStyle beerStyle;
     private String upc;

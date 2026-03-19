@@ -1,0 +1,2 @@
+ALTER TABLE beer
+    ADD email VARCHAR(255);
