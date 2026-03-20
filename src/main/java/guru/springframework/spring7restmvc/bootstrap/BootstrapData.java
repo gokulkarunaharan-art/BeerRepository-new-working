@@ -1,17 +1,24 @@
 package guru.springframework.spring7restmvc.bootstrap;
 
+import guru.springframework.spring7restmvc.csv.BeerCSVRecord;
 import guru.springframework.spring7restmvc.entities.Beer;
 import guru.springframework.spring7restmvc.entities.Customer;
 import guru.springframework.spring7restmvc.model.BeerStyle;
 import guru.springframework.spring7restmvc.repositories.BeerRepository;
 import guru.springframework.spring7restmvc.repositories.CustomerRepository;
+import guru.springframework.spring7restmvc.services.BeerCSVService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Component;
+import org.springframework.util.ResourceUtils;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * Created by jt, Spring Framework Guru.
@@ -21,11 +28,38 @@ import java.util.Arrays;
 public class BootstrapData implements CommandLineRunner {
     private final BeerRepository beerRepository;
     private final CustomerRepository customerRepository;
+    private final BeerCSVService beerCSVService;
 
     @Override
     public void run(String... args) throws Exception {
         loadBeerData();
+        loadCSV();
         loadCustomerData();
+    }
+
+    private void loadCSV() throws FileNotFoundException {
+        File file = ResourceUtils.getFile("classpath:csvdata/beers.csv");
+
+
+        beerCSVService.convertCSV(file).forEach(beerCSVRecord -> {
+            BeerStyle beerStyle;
+            try {
+                beerStyle = BeerStyle.valueOf(beerCSVRecord.getBeerStyle().toString());
+            } catch (IllegalArgumentException e) {
+                beerStyle = BeerStyle.LAGER; // default fallback
+            }
+
+            Beer beer = Beer.builder()
+                    .beerName(beerCSVRecord.getBeerName())
+                    .beerStyle(beerStyle)
+                    .upc(beerCSVRecord.getUpc())
+                    .quantityOnHand(beerCSVRecord.getQuantityOnHand())
+                    .price(beerCSVRecord.getPrice())
+                    .createdDate(LocalDateTime.parse(beerCSVRecord.getCreatedDate()))
+                    .updateDate(LocalDateTime.parse(beerCSVRecord.getUpdateDate()))
+                    .build();
+            beerRepository.save(beer);
+        });
     }
 
     private void loadBeerData() {
