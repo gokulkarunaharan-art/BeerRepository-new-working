@@ -4,6 +4,7 @@ import guru.springframework.spring7restmvc.model.BeerDTO;
 import guru.springframework.spring7restmvc.services.BeerService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -62,8 +63,8 @@ public class BeerController {
     }
 
     @GetMapping(value = BEER_PATH)
-    public List<BeerDTO> listBeers(){
-        return beerService.listBeers();
+    public Page<BeerDTO> listBeers(@RequestParam(required = false) String beerName, @RequestParam(required = false) Integer pageNumber, @RequestParam(required = false) Integer pageSize){
+        return beerService.listBeers(beerName,pageNumber,pageSize);
     }
 
 

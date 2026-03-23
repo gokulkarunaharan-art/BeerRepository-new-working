@@ -15,6 +15,7 @@ public class BeerCSVServiceImpl implements BeerCSVService {
     public List<BeerCSVRecord> convertCSV(File CSVFile) throws FileNotFoundException {
         List<BeerCSVRecord> beerCSVRecords = new CsvToBeanBuilder<BeerCSVRecord>(new FileReader(CSVFile))
                 .withType(BeerCSVRecord.class)
+                .withIgnoreLeadingWhiteSpace(true)
                 .build().parse();
         return  beerCSVRecords;
     }

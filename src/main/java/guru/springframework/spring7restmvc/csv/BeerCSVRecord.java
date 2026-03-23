@@ -12,13 +12,11 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 public class BeerCSVRecord {
-
     private String beerName;
-    private BeerStyle beerStyle;
+    private String beerStyle;
     private String upc;
     private Integer quantityOnHand;
     private BigDecimal price;
     private String createdDate;
     private String updateDate;
-
 }

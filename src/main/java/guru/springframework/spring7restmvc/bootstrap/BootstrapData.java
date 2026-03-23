@@ -38,28 +38,29 @@ public class BootstrapData implements CommandLineRunner {
     }
 
     private void loadCSV() throws FileNotFoundException {
-        File file = ResourceUtils.getFile("classpath:csvdata/beers.csv");
+        if(beerRepository.count() < 10){
+            File file = ResourceUtils.getFile("classpath:csvdata/beers.csv");
+            beerCSVService.convertCSV(file).forEach(beerCSVRecord -> {
+                BeerStyle beerStyle;
+                try {
+                    beerStyle = BeerStyle.valueOf(beerCSVRecord.getBeerStyle().toString());
+                } catch (IllegalArgumentException e) {
+                    beerStyle = BeerStyle.LAGER; // default fallback
+                }
 
+                Beer beer = Beer.builder()
+                        .beerName(beerCSVRecord.getBeerName())
+                        .beerStyle(beerStyle)
+                        .upc(beerCSVRecord.getUpc())
+                        .quantityOnHand(beerCSVRecord.getQuantityOnHand())
+                        .price(beerCSVRecord.getPrice())
+                        .createdDate(LocalDateTime.parse(beerCSVRecord.getCreatedDate()))
+                        .updateDate(LocalDateTime.parse(beerCSVRecord.getUpdateDate()))
+                        .build();
+                beerRepository.save(beer);
+            });
+        }
 
-        beerCSVService.convertCSV(file).forEach(beerCSVRecord -> {
-            BeerStyle beerStyle;
-            try {
-                beerStyle = BeerStyle.valueOf(beerCSVRecord.getBeerStyle().toString());
-            } catch (IllegalArgumentException e) {
-                beerStyle = BeerStyle.LAGER; // default fallback
-            }
-
-            Beer beer = Beer.builder()
-                    .beerName(beerCSVRecord.getBeerName())
-                    .beerStyle(beerStyle)
-                    .upc(beerCSVRecord.getUpc())
-                    .quantityOnHand(beerCSVRecord.getQuantityOnHand())
-                    .price(beerCSVRecord.getPrice())
-                    .createdDate(LocalDateTime.parse(beerCSVRecord.getCreatedDate()))
-                    .updateDate(LocalDateTime.parse(beerCSVRecord.getUpdateDate()))
-                    .build();
-            beerRepository.save(beer);
-        });
     }
 
     private void loadBeerData() {
